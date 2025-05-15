@@ -1,0 +1,699 @@
+:root {
+  --primary: #4361ee;
+  --primary-dark: #3a0ca3;
+  --primary-light: #4cc9f0;
+  --secondary: #f72585;
+  --secondary-dark: #d81159;
+  --accent: #7209b7;
+  --background: #f8f9fa;
+  --surface: #ffffff;
+  --surface-dark: #f1f3f5;
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --success: #38b000;
+  --danger: #ef233c;
+  --warning: #ff9e00;
+  --info: #00b4d8;
+  
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --shadow-inset: inset 0 2px 4px rgba(0,0,0,0.05);
+  
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 16px;
+  --border-radius-xl: 24px;
+  --border-radius-circle: 50%;
+  
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.45s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* App Container - Native App Feel */
+.app-container {
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--background);
+  position: relative;
+  overflow: hidden;
+}
+
+/* iOS-style header with blur effect */
+.app-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--text-primary);
+  padding: 1rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-title i {
+  color: var(--primary);
+}
+
+/* Connection controls with modern toggle */
+.connection-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.connection-toggle {
+  position: relative;
+  width: 52px;
+  height: 32px;
+}
+
+.connection-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.connection-toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: var(--transition-fast);
+  border-radius: 34px;
+}
+
+.connection-toggle .slider:before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: var(--transition-fast);
+  border-radius: var(--border-radius-circle);
+}
+
+.connection-toggle input:checked + .slider {
+  background-color: var(--success);
+}
+
+.connection-toggle input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.status-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Tab Navigation - Bottom Bar like mobile apps */
+.tab-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface);
+  position: relative;
+  overflow: hidden;
+}
+
+.tab-buttons {
+  display: flex;
+  justify-content: space-around;
+  background-color: var(--surface);
+  padding: 0.5rem 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tab-btn i {
+  font-size: 1.2rem;
+  transition: var(--transition-fast);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+}
+
+.tab-btn.active i {
+  transform: translateY(-2px);
+}
+
+.tab-content {
+  flex: 1;
+  padding: 1.5rem;
+  padding-bottom: 5rem; /* Space for bottom tab bar */
+  display: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Control Panels - Card-like with depth */
+.control-panel {
+  background-color: var(--surface);
+  border-radius: var(--border-radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+}
+
+.control-panel:active {
+  transform: scale(0.98);
+}
+
+.panel-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.panel-title i {
+  color: var(--primary);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(67, 97, 238, 0.1);
+  border-radius: var(--border-radius-circle);
+  padding: 0.5rem;
+}
+
+/* Modern Slider Controls */
+.slider-container {
+  margin: 1.25rem 0;
+}
+
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.slider-value {
+  font-weight: 600;
+  color: var(--primary);
+  font-feature-settings: "tnum";
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-dark);
+  outline: none;
+  margin: 0.75rem 0;
+  transition: var(--transition-fast);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--border-radius-circle);
+  background: var(--primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  border: 3px solid white;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  background: var(--primary-dark);
+}
+
+/* Button Styles - Modern Press Effect */
+.btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: var(--border-radius-circle);
+  transform: scale(1, 1) translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+
+.btn:focus:not(:active)::after {
+  animation: ripple 0.6s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(20, 20);
+    opacity: 0;
+  }
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.btn-group .btn {
+  flex: 1;
+}
+
+/* Microbit Buttons - Modern 3D Effect */
+.microbit-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem 0;
+  perspective: 1000px;
+}
+
+.microbit-button {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--border-radius-circle);
+  background: linear-gradient(145deg, #e6e6e6, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: var(--text-primary);
+  cursor: pointer;
+  box-shadow: 
+    5px 5px 10px rgba(0,0,0,0.1),
+    -5px -5px 10px rgba(255,255,255,0.8),
+    inset 0 0 0 rgba(0,0,0,0.1),
+    inset 0 0 0 rgba(255,255,255,0.5);
+  position: relative;
+  transition: var(--transition-fast);
+  transform-style: preserve-3d;
+}
+
+.microbit-button:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--border-radius-circle);
+  background: linear-gradient(145deg, #4361ee, #3a0ca3);
+  opacity: 0;
+  transition: var(--transition-fast);
+  transform: translateZ(-1px);
+}
+
+.microbit-button.pressed:before {
+  opacity: 1;
+}
+
+.microbit-button.pressed {
+  color: white;
+  box-shadow: 
+    inset 3px 3px 5px rgba(0,0,0,0.2),
+    inset -3px -3px 5px rgba(255,255,255,0.1);
+  transform: scale(0.95) translateZ(0);
+}
+
+.microbit-button span {
+  position: relative;
+  z-index: 1;
+}
+
+#buttonB {
+  background: linear-gradient(145deg, #f0f0f0, #ffffff);
+}
+
+#buttonB.pressed:before {
+  background: linear-gradient(145deg, #f72585, #d81159);
+}
+
+/* Joystick - Modern Game Controller Style */
+.joystick-area {
+  width: 200px;
+  height: 200px;
+  margin: 1.5rem auto;
+  position: relative;
+  background-color: var(--surface-dark);
+  border-radius: var(--border-radius-circle);
+  box-shadow: 
+    var(--shadow-inset),
+    0 0 0 8px rgba(67, 97, 238, 0.1);
+  touch-action: none;
+  user-select: none;
+}
+
+.joystick-base {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--border-radius-circle);
+  background: radial-gradient(circle at 30% 30%, #e1e5eb 0%, #c9d0db 100%);
+}
+
+.joystick-thumb {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--border-radius-circle);
+  background: linear-gradient(145deg, #4361ee, #3a56d4);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 
+    0 4px 8px rgba(0,0,0,0.2),
+    0 0 0 3px rgba(255,255,255,0.3);
+  cursor: move;
+  touch-action: none;
+  z-index: 10;
+  transition: transform 0.1s ease;
+}
+
+.joystick-coords {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+.joystick-coords span {
+  font-weight: 600;
+  color: var(--primary);
+  font-feature-settings: "tnum";
+}
+
+/* Sensor Graph - Modern Visualization */
+.sensor-graph {
+  height: 150px;
+  margin: 1rem 0;
+  background-color: var(--surface-dark);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+}
+
+.sensor-reading {
+  font-size: 1rem;
+  margin: 1rem 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sensor-reading span {
+  font-weight: 600;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+/* Switch Control - Modern Toggle */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  margin-right: 0.75rem;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: var(--transition-fast);
+  border-radius: 34px;
+}
+
+.switch .slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: var(--transition-fast);
+  border-radius: var(--border-radius-circle);
+}
+
+.switch input:checked + .slider {
+  background-color: var(--primary);
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
+.switch-container {
+  display: flex;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+/* Status Bar - iOS Style */
+.status-bar {
+  background-color: var(--surface);
+  color: var(--text-secondary);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.status-bar span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.connecting-icon {
+  transition: var(--transition-fast);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .app-title {
+    font-size: 1.2rem;
+  }
+  
+  .tab-btn {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .tab-btn i {
+    font-size: 1rem;
+  }
+  
+  .tab-content {
+    padding: 1rem;
+    padding-bottom: 5rem;
+  }
+  
+  .microbit-buttons {
+    gap: 1.5rem;
+  }
+  
+  .microbit-button {
+    width: 70px;
+    height: 70px;
+    font-size: 1.5rem;
+  }
+  
+  .joystick-area {
+    width: 180px;
+    height: 180px;
+  }
+}
+
+/* Animations */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.connecting {
+  animation: pulse 1.5s infinite;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+/* iOS-like scroll effect */
+.tab-content {
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbar but keep functionality */
+.tab-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Prevent text selection */
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Add this to your HTML body tag for iOS elastic scroll effect */
+body {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
