@@ -1,203 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Microbit Controller</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Mobile Controller</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <h1><i class="fas fa-microchip"></i> Microbit Controller</h1>
-            <div class="connection-controls">
-                <button id="connectBtn"><i class="fas fa-link"></i> Connect</button>
-                <button id="settingsBtn"><i class="fas fa-cog"></i> Settings</button>
-                <span id="connectionStatus"><span class="status-indicator"></span> Disconnected</span>
-            </div>
-        </header>
-
-        <div class="tab-container">
-            <div class="tab-buttons">
-                <button class="tab-btn active" data-tab="motors">
-                    <i class="fas fa-motorcycle"></i> Motors
-                </button>
-                <button class="tab-btn" data-tab="sensors">
-                    <i class="fas fa-wave-square"></i> Sensors
-                </button>
-                <button class="tab-btn" data-tab="buttons">
-                    <i class="fas fa-gamepad"></i> Buttons
-                </button>
-                <button class="tab-btn" data-tab="advanced">
-                    <i class="fas fa-sliders-h"></i> Advanced
-                </button>
-            </div>
-
-            <div class="tab-content active" id="motors-tab">
-                <div class="control-panel">
-                    <h2><i class="fas fa-cogs"></i> DC MOTOR CONTROL</h2>
-                    <div class="slider-container">
-                        <label for="motor1Slider">Motor 1 Speed</label>
-                        <input type="range" id="motor1Slider" min="0" max="100" value="0" class="slider">
-                        <div class="slider-value" id="motor1Value">0%</div>
-                        <div class="button-group">
-                            <button id="motor1Dec"><i class="fas fa-minus"></i></button>
-                            <button id="motor1Inc"><i class="fas fa-plus"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <label for="motor2Slider">Motor 2 Speed</label>
-                        <input type="range" id="motor2Slider" min="0" max="100" value="0" class="slider">
-                        <div class="slider-value" id="motor2Value">0%</div>
-                        <div class="button-group">
-                            <button id="motor2Dec"><i class="fas fa-minus"></i></button>
-                            <button id="motor2Inc"><i class="fas fa-plus"></i></button>
-                        </div>
-                    </div>
-                    
-                    <div class="button-group">
-                        <button id="motorFwd" class="direction-btn"><i class="fas fa-arrow-up"></i> FWD</button>
-                        <button id="motorRev" class="direction-btn"><i class="fas fa-arrow-down"></i> REV</button>
-                        <button id="motorStop" class="direction-btn"><i class="fas fa-stop"></i> STOP</button>
-                    </div>
-                </div>
-                
-                <div class="control-panel">
-                    <h2><i class="fas fa-undo"></i> SERVO CONTROL</h2>
-                    <div class="slider-container">
-                        <label for="servo1Slider">Servo 1 Angle</label>
-                        <input type="range" id="servo1Slider" min="0" max="360" value="90" class="slider">
-                        <div class="slider-value" id="servo1Value">90°</div>
-                        <div class="button-group">
-                            <button id="servo1_0">0°</button>
-                            <button id="servo1_90">90°</button>
-                            <button id="servo1_180">180°</button>
-                            <button id="servo1_270">270°</button>
-                        </div>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <label for="servo2Slider">Servo 2 Angle</label>
-                        <input type="range" id="servo2Slider" min="0" max="360" value="90" class="slider">
-                        <div class="slider-value" id="servo2Value">90°</div>
-                        <div class="button-group">
-                            <button id="servo2_0">0°</button>
-                            <button id="servo2_90">90°</button>
-                            <button id="servo2_180">180°</button>
-                            <button id="servo2_270">270°</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="sensors-tab">
-                <div class="control-panel">
-                    <h2><i class="fas fa-infinity"></i> IR SENSOR</h2>
-                    <div class="sensor-reading">Reading: <span id="irReading">--</span> cm</div>
-                    
-                    <div class="slider-container">
-                        <label for="irThreshold">Threshold</label>
-                        <input type="range" id="irThreshold" min="10" max="200" value="50" class="slider">
-                        <div class="slider-value" id="irThresholdValue">50 cm</div>
-                    </div>
-                    
-                    <div class="switch-container">
-                        <label class="switch">
-                            <input type="checkbox" id="irAlertToggle" checked>
-                            <span class="slider round"></span>
-                        </label>
-                        <span>Alert when &lt; threshold</span>
-                    </div>
-                </div>
-                
-                <div class="control-panel">
-                    <h2><i class="fas fa-wave-square"></i> ULTRASONIC SENSOR</h2>
-                    <div class="sensor-reading">Distance: <span id="usReading">--</span> cm</div>
-                    
-                    <div class="sensor-graph">
-                        <canvas id="usGraph" width="100%" height="150"></canvas>
-                    </div>
-                    
-                    <div class="update-rate">
-                        <label for="usUpdateRate">Update Rate:</label>
-                        <select id="usUpdateRate">
-                            <option value="1">1 Hz</option>
-                            <option value="5">5 Hz</option>
-                            <option value="10">10 Hz</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="buttons-tab">
-                <div class="buttons-container">
-                    <h2><i class="fas fa-hand-pointer"></i> BUTTON EMULATION</h2>
-                    
-                    <div class="microbit-buttons">
-                        <div class="microbit-button" id="buttonA">
-                            <span>A</span>
-                        </div>
-                        <div class="microbit-button" id="buttonB">
-                            <span>B</span>
-                        </div>
-                    </div>
-                    
-                    <div class="press-options">
-                        <div>Press & Hold Duration</div>
-                        <input type="range" id="holdDuration" min="100" max="2000" value="500">
-                        <div class="slider-value" id="holdDurationValue">500 ms</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="advanced-tab">
-                <div class="control-panel">
-                    <h2><i class="fas fa-joystick"></i> VIRTUAL JOYSTICK</h2>
-                    <div class="joystick-area" id="joystickArea">
-                        <div class="joystick-base"></div>
-                        <div class="joystick-thumb" id="joystickThumb"></div>
-                    </div>
-                    <div class="joystick-coords">
-                        X: <span id="joystickX">0</span> 
-                        Y: <span id="joystickY">0</span>
-                    </div>
-                </div>
-                
-                <div class="control-panel">
-                    <h2><i class="fas fa-tachometer-alt"></i> SPEED PROFILES</h2>
-                    <div class="button-group">
-                        <button id="speedLow"><i class="fas fa-snail"></i> Low</button>
-                        <button id="speedMed"><i class="fas fa-walking"></i> Medium</button>
-                        <button id="speedHigh"><i class="fas fa-running"></i> High</button>
-                    </div>
-                    
-                    <div class="slider-container">
-                        <label for="customSpeed">Custom Speed</label>
-                        <input type="range" id="customSpeed" min="0" max="100" value="50" class="slider">
-                        <div class="slider-value" id="customSpeedValue">50%</div>
-                    </div>
-                    
-                    <div class="button-group">
-                        <button id="rampUp"><i class="fas fa-angle-double-up"></i> Ramp Up</button>
-                        <button id="rampDown"><i class="fas fa-angle-double-down"></i> Ramp Down</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="status-bar">
-            <span><i class="fas fa-circle-notch fa-spin connecting-icon"></i> Status: <span id="statusText">Disconnected</span></span>
-            <span><i class="fas fa-battery-three-quarters"></i> Battery: <span id="batteryLevel">--%</span></span>
-        </div>
+  <h1>Mobile Controller</h1>
+  <div class="control-panel">
+    <div class="vertical-slider">
+      <div class="slider-label">LEFT</div>
+      <div class="slider-container">
+        <input type="range" min="-255" max="255" value="0" id="leftSlider">
+      </div>
     </div>
+    <div class="vertical-slider">
+      <div class="slider-label">RIGHT</div>
+      <div class="slider-container">
+        <input type="range" min="-255" max="255" value="0" id="rightSlider">
+      </div>
+    </div>
+  </div>
+  <div class="connect-btn">
+    <button id="connectButton">CONNECT <span id="statusIndicator" class="status-indicator"></span></button>
+  </div>
+  <div id="outputLog">
+    Sent: <span id="serialOutput">--</span>
+  </div>
 
-    <!-- Chart.js for sensor graphs -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="app.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
