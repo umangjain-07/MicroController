@@ -3,29 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mobile Controller</title>
+  <title>Microbit Controller</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>Mobile Controller</h1>
-  <div class="control-panel">
-    <div class="vertical-slider">
-      <div class="slider-label">LEFT</div>
-      <div class="slider-container">
-        <input type="range" min="-255" max="255" value="0" id="leftSlider">
+
+  <!-- Mode Toggle -->
+  <div class="mode-toggle">
+    <label><input type="radio" name="mode" value="serial" checked> Serial Mode</label>
+    <label><input type="radio" name="mode" value="radio"> Radio Mode</label>
+  </div>
+
+  <!-- Serial Mode UI -->
+  <div id="serialModePanel">
+    <div class="control-panel">
+      <div class="vertical-slider">
+        <div class="slider-label">LEFT</div>
+        <div class="slider-container">
+          <input type="range" min="-255" max="255" value="0" id="leftSlider" class="motor-slider">
+          <!-- <div class="slider-value" id="leftValue">0</div> -->
+        </div>
+        <div class="direction-indicator">
+          <!-- <span class="direction-label">Anticlockwise</span>
+          <span class="direction-label">Clockwise</span> -->
+        </div>
+      </div>
+      <div class="vertical-slider">
+        <div class="slider-label">RIGHT</div>
+        <div class="slider-container">
+          <input type="range" min="-255" max="255" value="0" id="rightSlider" class="motor-slider">
+          <!-- <div class="slider-value" id="rightValue">0</div> -->
+        </div>
+        <div class="direction-indicator">
+          <!-- <span class="direction-label">Anticlockwise</span>
+          <span class="direction-label">Clockwise</span> -->
+        </div>
       </div>
     </div>
-    <div class="vertical-slider">
-      <div class="slider-label">RIGHT</div>
-      <div class="slider-container">
-        <input type="range" min="-255" max="255" value="0" id="rightSlider">
+
+    <div class="servo-input">
+  <label for="servoSlider">Servo Angle</label>
+  <div class="servo-slider-container">
+    <input type="range" id="servoSlider" min="0" max="180" value="90" class="servo-slider">
+  </div>
+  <div class="servo-presets">
+    <button class="servo-preset-btn" data-angle="0">0°</button>
+    <button class="servo-preset-btn" data-angle="45">45°</button>
+    <button class="servo-preset-btn" data-angle="90">90°</button>
+    <button class="servo-preset-btn" data-angle="135">135°</button>
+    <button class="servo-preset-btn" data-angle="180">180°</button>
+  </div>
+  <div class="slider-value" id="servoValue">90</div>
+</div>
+  </div>
+
+  <!-- Radio Mode UI -->
+  <div id="radioModePanel" style="display: none;">
+    <div class="radio-setup">
+      <label for="radioChannel">Radio Channel:</label>
+      <input type="number" id="radioChannel" min="0" max="255" value="1">
+      <span id="radioChannelValue">1</span>
+
+      <div class="custom-input">
+        <label for="customInput">Custom Input:</label>
+        <input type="number" id="customInput" min="0" max="999" placeholder="Enter value">
+        <button id="sendCustomBtn">Send</button>
       </div>
+    </div>
+
+    <div class="button-grid">
+      <button class="input-btn" data-value="1" id="btnA">A</button>
+      <button class="input-btn" data-value="2" id="btnB">B</button>
+      <button class="input-btn" data-value="3" id="btnAB">A+B</button>
+      <button class="input-btn" data-value="4" id="btnUp">Up</button>
+      <button class="input-btn" data-value="5" id="btnDown">Down</button>
+      <button class="input-btn" data-value="6" id="btnLeft">Left</button>
+      <button class="input-btn" data-value="7" id="btnRight">Right</button>
     </div>
   </div>
+
+  <!-- Connect + Output -->
   <div class="connect-btn">
     <button id="connectButton">CONNECT <span id="statusIndicator" class="status-indicator"></span></button>
   </div>
+
   <div id="outputLog">
     Sent: <span id="serialOutput">--</span>
   </div>

@@ -1,8 +1,20 @@
-let port, writer, isConnected = false, lastLeft = 0, lastRight = 0;
+let port, writer, isConnected = false;
+let lastLeft = 0, lastRight = 0, lastServo = 90;
 let activeSlider = null;
 let lastSendTime = 0;
 const sendInterval = 150; // milliseconds delay between sends
 
+// Mode handling
+function initModeToggle() {
+  document.querySelectorAll('input[name="mode"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      document.getElementById('serialModePanel').style.display = e.target.value === 'serial' ? 'block' : 'none';
+      document.getElementById('radioModePanel').style.display = e.target.value === 'radio' ? 'block' : 'none';
+    });
+  });
+}
+
+// Touch and slider handling
 function handleTouchStart(e) {
   activeSlider = e.target;
   e.preventDefault();
@@ -18,8 +30,7 @@ function handleTouchMove(e) {
   const rect = activeSlider.getBoundingClientRect();
   const percentage = (touch.clientY - rect.top) / rect.height;
   const clamped = Math.max(0, Math.min(1, percentage));
-  
-  // Recalculate slider value based on vertical position
+
   const min = parseInt(activeSlider.min);
   const max = parseInt(activeSlider.max);
   const value = Math.round(min + (max - min) * (1 - clamped));
@@ -33,60 +44,144 @@ function handleTouchMove(e) {
 
 function handleTouchEnd(e) {
   if (activeSlider) {
-    resetSlider(activeSlider.id);
+    if (activeSlider.classList.contains('motor-slider')) {
+      activeSlider.value = 0;
+      const event = new Event('input', { bubbles: true });
+      activeSlider.dispatchEvent(event);
+    }
     activeSlider = null;
   }
 }
 
-// Initialize sliders with touch support
 function initSliders() {
   const sliders = document.querySelectorAll('input[type="range"]');
-  
+
   sliders.forEach(slider => {
+    // Update value displays
+    const valueDisplay = document.getElementById(`${slider.id}Value`);
+    if (valueDisplay) {
+      valueDisplay.textContent = slider.value;
+      slider.addEventListener('input', () => {
+        valueDisplay.textContent = slider.value;
+      });
+    }
+
     // Mouse/pointer events
     slider.addEventListener('input', handleSliderChange);
     slider.addEventListener('change', handleSliderChange);
-    slider.addEventListener('mouseup', () => resetSlider(slider.id));
-    
+    slider.addEventListener('mouseup', () => {
+      if (slider.classList.contains('motor-slider')) {
+        slider.value = 0;
+        const event = new Event('input', { bubbles: true });
+        slider.dispatchEvent(event);
+      }
+    });
+
     // Touch events
     slider.addEventListener('touchstart', handleTouchStart, { passive: false });
     slider.addEventListener('touchend', handleTouchEnd, { passive: false });
   });
-  
-  // Add global touch move listener
+
   document.addEventListener('touchmove', handleTouchMove, { passive: false });
 }
 
 function handleSliderChange(e) {
+  const now = Date.now();
+  if (now - lastSendTime < sendInterval) return;
+  lastSendTime = now;
+
   const slider = e.target;
-  const val = slider.value;
-  const side = slider.id === 'leftSlider' ? 'L' : 'R';
-  
-  if ((side === 'L' && val !== lastLeft) || (side === 'R' && val !== lastRight)) {
-    const command = generateMotorCommand(side, val);
-    sendSerial(command);
-    
-    if (side === 'L') lastLeft = val;
-    else lastRight = val;
+  if (slider.id === 'leftSlider' || slider.id === 'rightSlider' || slider.id === 'servoSlider') {
+    sendSerialCommand();
   }
 }
 
-function resetSlider(id) {
-  const slider = document.getElementById(id);
-  slider.value = 0;
-  const side = id === 'leftSlider' ? 'L' : 'R';
-  sendSerial(generateMotorCommand(side, 0));
-  
-  if (side === 'L') lastLeft = 0;
-  else lastRight = 0;
+// Servo preset button handling
+function initServoPresets() {
+  document.querySelectorAll('.servo-preset-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const angle = button.getAttribute('data-angle');
+      const servoSlider = document.getElementById('servoSlider');
+      const servoValueDisplay = document.getElementById('servoValue');
+
+      // Update slider value and display
+      servoSlider.value = angle;
+      servoValueDisplay.textContent = angle;
+
+      // Directly trigger serial command to ensure it's sent
+      const now = Date.now();
+      if (now - lastSendTime >= sendInterval) {
+        lastSendTime = now;
+        sendSerialCommand();
+      }
+    });
+  });
 }
 
+// Serial mode command generation
+function sendSerialCommand() {
+  const leftValue = parseInt(document.getElementById('leftSlider').value);
+  const rightValue = parseInt(document.getElementById('rightSlider').value);
+  const servoValue = parseInt(document.getElementById('servoSlider').value);
+
+  // Get directions (A for negative/anticlockwise, C for positive/clockwise)
+  const leftDir = leftValue < 0 ? 'A' : 'C';
+  const rightDir = rightValue < 0 ? 'A' : 'C';
+  
+  // Get absolute speeds
+  const leftSpeed = Math.abs(leftValue);
+  const rightSpeed = Math.abs(rightValue);
+
+  // Only send if values have changed
+  if (leftSpeed !== lastLeft || rightSpeed !== lastRight || servoValue !== lastServo) {
+    const command = `L${leftSpeed}R${rightSpeed}S${servoValue}#${leftDir}${rightDir}$`;
+    sendSerial(command);
+    
+    lastLeft = leftSpeed;
+    lastRight = rightSpeed;
+    lastServo = servoValue;
+  }
+}
+
+// Radio mode command generation
+function initRadioControls() {
+  // Update radio channel display
+  const radioChannel = document.getElementById('radioChannel');
+  const radioChannelValue = document.getElementById('radioChannelValue');
+  radioChannel.addEventListener('input', () => {
+    radioChannelValue.textContent = radioChannel.value;
+  });
+
+  // Button handlers
+  document.querySelectorAll('.input-btn').forEach(button => {
+    button.addEventListener('click', () => {
+      const value = button.getAttribute('data-value');
+      sendRadioCommand(value);
+    });
+  });
+
+  // Custom input handler
+  document.getElementById('sendCustomBtn').addEventListener('click', () => {
+    const value = document.getElementById('customInput').value;
+    if (value) {
+      sendRadioCommand(value);
+    }
+  });
+}
+
+function sendRadioCommand(value) {
+  const channel = document.getElementById('radioChannel').value;
+  const command = `RC${channel}#${value}`;
+  sendSerial(command);
+}
+
+// Serial connection functions
 async function connectSerial() {
   try {
     if (!navigator.serial) {
       throw new Error('Web Serial API not supported in this browser.');
     }
-    
+
     port = await navigator.serial.requestPort();
     await port.open({ baudRate: 115200 });
     writer = port.writable.getWriter();
@@ -103,10 +198,6 @@ async function connectSerial() {
 }
 
 async function sendSerial(data) {
-  const now = Date.now();
-  if (now - lastSendTime < sendInterval) return; // throttle sends
-  lastSendTime = now;
-
   console.log(data);
   document.getElementById('serialOutput').textContent = data;
 
@@ -123,21 +214,11 @@ async function sendSerial(data) {
   }
 }
 
-
-function generateMotorCommand(side, value) {
-  value = parseInt(value);
-//   if (value === 0) {
-//     return `${side.toUpperCase()}STOP$`;
-//   }
-  
-  const direction = value > 0 ? "CW" : "CCW";
-//   const speed = Math.abs(value).toString().padStart(3, '0');
-  const speed = Math.abs(value).toString();
-  return `${side.toUpperCase()}${direction}#${speed}$,`;
-}
-
-// Initialize the controller when DOM is loaded
+// Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  initModeToggle();
   initSliders();
+  initRadioControls();
+  initServoPresets();
   document.getElementById('connectButton').addEventListener('click', connectSerial);
 });
