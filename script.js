@@ -171,7 +171,7 @@ function initRadioControls() {
 
 function sendRadioCommand(value) {
   const channel = document.getElementById('radioChannel').value;
-  const command = `RC${channel}#${value}`;
+  const command = `RC${channel}#${value}$`;
   sendSerial(command);
 }
 
