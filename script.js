@@ -87,11 +87,17 @@ function initSliders() {
 
 function handleSliderChange(e) {
   const now = Date.now();
+  
   if (now - lastSendTime < sendInterval) return;
   lastSendTime = now;
 
   const slider = e.target;
   if (slider.id === 'leftSlider' || slider.id === 'rightSlider' || slider.id === 'servoSlider') {
+    // Update the display value when slider changes
+    if (slider.id === 'servoSlider') {
+      const servoValueDisplay = document.getElementById('servoValue');
+      servoValueDisplay.textContent = slider.value;
+    }
     sendSerialCommand();
   }
 }
