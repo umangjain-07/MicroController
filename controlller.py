@@ -12,8 +12,8 @@ def rotatecheck():
     elif String2.includes("AA"):
         Ldirection = 1
         Rdirection = 1
-    radio.send_value("Ldirection", Ldirection)
-    radio.send_value("Rdirection", Rdirection)
+    radio.send_value("Ld", Ldirection)
+    radio.send_value("Rd", Rdirection)
 def convert(startindex: str, endindex: str):
     global start_index, end_index, value
     start_index = String2.index_of(startindex)
@@ -42,7 +42,7 @@ def on_forever():
         radio.send_number(value)
         basic.show_icon(IconNames.SWORD)
         basic.clear_screen()
-    else:
+    elif String2.includes("#"):
         convert("L", "R")
         radio.send_value("Lspeed", value)
         convert("R", "S")
