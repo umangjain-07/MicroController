@@ -415,6 +415,76 @@ input[type="range"].servo-slider:active::-webkit-slider-thumb {
   box-shadow: 0 0 6px var(--success-color);
 }
 
+/* Custom Send Button Styles */
+#sendCustomBtn {
+  width: 100%;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: white;
+  background: linear-gradient(145deg, var(--primary-color), var(--accent-color));
+  border: var(--control-border);
+  border-radius: var(--button-radius);
+  box-shadow: var(--control-shadow);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#sendCustomBtn:hover {
+  box-shadow: 0 0 15px var(--primary-color);
+  transform: translateY(-2px);
+}
+
+#sendCustomBtn:active {
+  transform: translateY(1px);
+  box-shadow: var(--button-press);
+}
+
+/* Optional: Add a glowing effect */
+#sendCustomBtn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 242, 255, 0) 0%,
+    rgba(0, 242, 255, 0) 45%,
+    rgba(0, 242, 255, 0.3) 50%,
+    rgba(0, 242, 255, 0) 55%,
+    rgba(0, 242, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  animation: shine 3s infinite;
+  opacity: 0;
+}
+
+@keyframes shine {
+  0% {
+    transform: rotate(30deg) translate(-30%, -30%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(30deg) translate(30%, 30%);
+    opacity: 0;
+  }
+}
+
+#sendCustomBtn:hover::after {
+  animation: shine 1.5s infinite;
+}
+
 /* Output Log */
 #outputLog {
   width: 90%;
