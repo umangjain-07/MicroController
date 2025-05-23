@@ -181,6 +181,148 @@ function sendRadioCommand(value) {
   sendSerial(command);
 }
 
+// Keyboard controls
+function initKeyboardControls() {
+  document.addEventListener('keydown', (e) => {
+    const now = Date.now();
+    if (now - lastSendTime < sendInterval) return;
+    lastSendTime = now;
+
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+
+    if (mode === 'radio') {
+      // Radio mode key bindings (unchanged)
+      switch (e.key.toLowerCase()) {
+        case 'arrowup':
+        case 'w':
+          sendRadioCommand('4');
+          break;
+        case 'arrowdown':
+        case 's':
+          sendRadioCommand('5');
+          break;
+        case 'arrowleft':
+        case 'a':
+          sendRadioCommand('6');
+          break;
+        case 'arrowright':
+        case 'd':
+          sendRadioCommand('7');
+          break;
+        case 'f':
+          sendRadioCommand('1');
+          break;
+        case 'g':
+          sendRadioCommand('2');
+          break;
+        case 'r':
+          sendRadioCommand('3');
+          break;
+      }
+    } else if (mode === 'serial') {
+      // Serial mode key bindings
+      const leftSlider = document.getElementById('leftSlider');
+      const rightSlider = document.getElementById('rightSlider');
+      const servoSlider = document.getElementById('servoSlider');
+      const maxSpeed = parseInt(leftSlider.max); // Assuming both motor sliders have same max
+      const minSpeed = parseInt(leftSlider.min);
+      const servoMax = parseInt(servoSlider.max);
+      const servoMin = parseInt(servoSlider.min);
+      const motorStep = maxSpeed / 10; // Step size for motor sliders
+      const servoStep = (servoMax - servoMin) / 10; // Step size for servo slider
+
+      let leftValue = parseInt(leftSlider.value);
+      let rightValue = parseInt(rightSlider.value);
+      let servoValue = parseInt(servoSlider.value);
+      let changed = false;
+
+      switch (e.key.toLowerCase()) {
+        case 'arrowup':
+        case 'w':
+          // Both sliders go up; if negative, reset to 0 first
+          leftValue = leftValue < 0 ? 0 : Math.min(maxSpeed, leftValue + motorStep);
+          rightValue = rightValue < 0 ? 0 : Math.min(maxSpeed, rightValue + motorStep);
+          changed = true;
+          break;
+        case 'arrowdown':
+        case 's':
+          // Both sliders go down; if positive, reset to 0 first
+          leftValue = leftValue > 0 ? 0 : Math.max(minSpeed, leftValue - motorStep);
+          rightValue = rightValue > 0 ? 0 : Math.max(minSpeed, rightValue - motorStep);
+          changed = true;
+          break;
+        case 'arrowleft':
+        case 'a':
+          // Left goes down (if positive, reset to 0); right goes up (if negative, reset to 0)
+          leftValue = leftValue > 0 ? 0 : Math.max(minSpeed, leftValue - motorStep);
+          rightValue = rightValue < 0 ? 0 : Math.min(maxSpeed, rightValue + motorStep);
+          changed = true;
+          break;
+        case 'arrowright':
+        case 'd':
+          // Right goes down (if positive, reset to 0); left goes up (if negative, reset to 0)
+          rightValue = rightValue > 0 ? 0 : Math.max(minSpeed, rightValue - motorStep);
+          leftValue = leftValue < 0 ? 0 : Math.min(maxSpeed, leftValue + motorStep);
+          changed = true;
+          break;
+        case '=': // '+' key (with or without Shift)
+        case '+':
+          servoValue = Math.min(servoMax, servoValue + servoStep);
+          changed = true;
+          break;
+        case '-':
+          servoValue = Math.max(servoMin, servoValue - servoStep);
+          changed = true;
+          break;
+      }
+
+      if (changed) {
+        // Update sliders
+        leftSlider.value = leftValue;
+        rightSlider.value = rightValue;
+        servoSlider.value = servoValue;
+
+        // Update display values
+        document.getElementById('leftSliderValue').textContent = leftValue;
+        document.getElementById('rightSliderValue').textContent = rightValue;
+        document.getElementById('servoValue').textContent = servoValue;
+
+        // Directly send serial command
+        sendSerialCommand();
+
+        // Trigger input event for consistency
+        const event = new Event('input', { bubbles: true });
+        leftSlider.dispatchEvent(event);
+      }
+    }
+  });
+
+  // Reset motor sliders to 0 on keyup in serial mode
+  document.addEventListener('keyup', (e) => {
+    const now = Date.now();
+    if (now - lastSendTime < sendInterval) return;
+    lastSendTime = now;
+
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    if (mode === 'serial') {
+      const leftSlider = document.getElementById('leftSlider');
+      const rightSlider = document.getElementById('rightSlider');
+      const keys = ['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 's', 'a', 'd'];
+
+      if (keys.includes(e.key.toLowerCase())) {
+        leftSlider.value = 0;
+        rightSlider.value = 0;
+        document.getElementById('leftSliderValue').textContent = 0;
+        document.getElementById('rightSliderValue').textContent = 0;
+        // Directly send serial command
+        sendSerialCommand();
+        // Trigger input event for consistency
+        const event = new Event('input', { bubbles: true });
+        leftSlider.dispatchEvent(event);
+      }
+    }
+  });
+}
 // Serial connection functions
 async function connectSerial() {
   try {
@@ -226,5 +368,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSliders();
   initRadioControls();
   initServoPresets();
+  initKeyboardControls();
   document.getElementById('connectButton').addEventListener('click', connectSerial);
 });
