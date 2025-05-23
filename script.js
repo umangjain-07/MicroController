@@ -275,6 +275,7 @@ function initKeyboardControls() {
           changed = true;
           break;
       }
+      sendSerialCommand();
 
       if (changed) {
         // Update sliders
