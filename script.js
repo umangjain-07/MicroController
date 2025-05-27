@@ -2,7 +2,7 @@ let port, writer, isConnected = false;
 let lastLeft = 0, lastRight = 0, lastServo = 90;
 let activeSlider = null;
 let lastSendTime = 0;
-const sendInterval = 200; // milliseconds delay between sends
+const sendInterval = 10; // milliseconds delay between sends
 
 // Mode handling
 function initModeToggle() {
