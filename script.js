@@ -2,7 +2,7 @@ let port, writer, isConnected = false;
 let lastLeft = 0, lastRight = 0, lastServo = 90;
 let activeSlider = null;
 let lastSendTime = 0;
-const sendInterval = 10; // milliseconds delay between sends
+const sendInterval = 120; // milliseconds delay between sends
 
 // Mode handling
 function initModeToggle() {
@@ -87,7 +87,7 @@ function initSliders() {
 
 function handleSliderChange(e) {
   const now = Date.now();
-  
+
   if (now - lastSendTime < sendInterval) return;
   lastSendTime = now;
 
@@ -133,7 +133,7 @@ function sendSerialCommand() {
   // Get directions (A for negative/anticlockwise, C for positive/clockwise)
   const leftDir = leftValue < 0 ? 'A' : 'C';
   const rightDir = rightValue < 0 ? 'A' : 'C';
-  
+
   // Get absolute speeds
   const leftSpeed = Math.abs(leftValue);
   const rightSpeed = Math.abs(rightValue);
@@ -142,7 +142,7 @@ function sendSerialCommand() {
   if (leftSpeed !== lastLeft || rightSpeed !== lastRight || servoValue !== lastServo) {
     const command = `L${leftSpeed}R${rightSpeed}S${servoValue}#${leftDir}${rightDir}$`;
     sendSerial(command);
-    
+
     lastLeft = leftSpeed;
     lastRight = rightSpeed;
     lastServo = servoValue;
@@ -278,20 +278,20 @@ function initKeyboardControls() {
       sendSerialCommand();
 
       // Update sliders
-        leftSlider.value = leftValue;
-        rightSlider.value = rightValue;
-        servoSlider.value = servoValue;
+      leftSlider.value = leftValue;
+      rightSlider.value = rightValue;
+      servoSlider.value = servoValue;
 
-        // Update display values
-        document.getElementById('leftSliderValue').textContent = leftValue;
-        document.getElementById('rightSliderValue').textContent = rightValue;
-        document.getElementById('servoValue').textContent = servoValue;
+      // Update display values
+      document.getElementById('leftSliderValue').textContent = leftValue;
+      document.getElementById('rightSliderValue').textContent = rightValue;
+      document.getElementById('servoValue').textContent = servoValue;
 
-        
 
-        // Trigger input event for consistency
-        const event = new Event('input', { bubbles: true });
-        leftSlider.dispatchEvent(event);
+
+      // Trigger input event for consistency
+      const event = new Event('input', { bubbles: true });
+      leftSlider.dispatchEvent(event);
     }
   });
 
