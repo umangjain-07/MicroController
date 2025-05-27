@@ -2,7 +2,7 @@ let port, writer, isConnected = false;
 let lastLeft = 0, lastRight = 0, lastServo = 90;
 let activeSlider = null;
 let lastSendTime = 0;
-const sendInterval = 150; // milliseconds delay between sends
+const sendInterval = 200; // milliseconds delay between sends
 
 // Mode handling
 function initModeToggle() {
@@ -277,8 +277,7 @@ function initKeyboardControls() {
       }
       sendSerialCommand();
 
-      if (changed) {
-        // Update sliders
+      // Update sliders
         leftSlider.value = leftValue;
         rightSlider.value = rightValue;
         servoSlider.value = servoValue;
@@ -288,13 +287,11 @@ function initKeyboardControls() {
         document.getElementById('rightSliderValue').textContent = rightValue;
         document.getElementById('servoValue').textContent = servoValue;
 
-        // Directly send serial command
-        sendSerialCommand();
+        
 
         // Trigger input event for consistency
         const event = new Event('input', { bubbles: true });
         leftSlider.dispatchEvent(event);
-      }
     }
   });
 
