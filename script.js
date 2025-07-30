@@ -101,8 +101,11 @@ function updateSliderFromTouch(touch, slider) {
   let percentage;
   
   if (slider.classList.contains('motor-slider')) {
-    // Vertical slider (rotated)
-    percentage = (touch.clientY - rect.top) / rect.height;
+    // For rotated vertical sliders (-90deg rotation)
+    // We need to map clientX to the slider value since it's rotated
+    // Left side of rotated slider = top (max value)
+    // Right side of rotated slider = bottom (min value)
+    percentage = 1 - ((touch.clientX - rect.left) / rect.width);
   } else {
     // Horizontal slider
     percentage = (touch.clientX - rect.left) / rect.width;
@@ -112,12 +115,7 @@ function updateSliderFromTouch(touch, slider) {
   const min = parseInt(slider.min);
   const max = parseInt(slider.max);
   
-  let value;
-  if (slider.classList.contains('motor-slider')) {
-    value = Math.round(min + (max - min) * (1 - clamped));
-  } else {
-    value = Math.round(min + (max - min) * clamped);
-  }
+  const value = Math.round(min + (max - min) * clamped);
 
   if (slider.value != value) {
     slider.value = value;
@@ -399,12 +397,26 @@ function initTouchControls() {
     // Determine direction
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
+    const deltaX = x - centerX;
+    const deltaY = y - centerY;
+    
+    // Use a threshold to determine primary direction
+    const threshold = 20; // minimum distance from center
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance < threshold) {
+      // Too close to center, don't register direction
+      return;
+    }
     
     let direction = '';
-    if (Math.abs(x - centerX) > Math.abs(y - centerY)) {
-      direction = x > centerX ? 'right' : 'left';
+    // Determine primary direction based on larger component
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Horizontal movement is primary
+      direction = deltaX > 0 ? 'right' : 'left';
     } else {
-      direction = y > centerY ? 'down' : 'up';
+      // Vertical movement is primary
+      direction = deltaY > 0 ? 'down' : 'up';
     }
     
     // Activate corresponding zone
@@ -428,6 +440,32 @@ function initTouchControls() {
     
     touchIndicator.style.left = x + 'px';
     touchIndicator.style.top = y + 'px';
+    
+    // Update direction during move
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const deltaX = x - centerX;
+    const deltaY = y - centerY;
+    
+    const threshold = 20;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    if (distance >= threshold) {
+      let direction = '';
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        direction = deltaX > 0 ? 'right' : 'left';
+      } else {
+        direction = deltaY > 0 ? 'down' : 'up';
+      }
+      
+      // Update active zones
+      touchZones.forEach(zone => {
+        zone.classList.remove('active');
+        if (zone.dataset.direction === direction) {
+          zone.classList.add('active');
+        }
+      });
+    }
   });
   
   touchPad.addEventListener('touchend', (e) => {
